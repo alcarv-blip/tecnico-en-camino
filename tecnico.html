@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Técnico en Camino</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/tecnico.css" />
+</head>
+<body class="dark-theme">
+  <header class="app-header">
+    <div class="header-logo">
+      <span class="logo-icon">⚙️</span>
+      <span class="logo-text">Técnico en Camino</span>
+    </div>
+    <div class="header-badge" id="statusBadge">
+      <span class="badge-dot"></span>
+      <span class="badge-label">Inactivo</span>
+    </div>
+  </header>
+  <main class="main-content">
+    <section class="status-panel" id="statusPanel">
+      <div class="status-icon-wrap">
+        <div class="status-icon">🛠️</div>
+      </div>
+      <h1 class="status-title">¿Listo para salir?</h1>
+      <p class="status-desc">Presioná <strong>Iniciar Viaje</strong> para compartir tu ubicación en tiempo real con el cliente.</p>
+    </section>
+    <section class="map-section hidden" id="mapSection">
+      <div id="map"></div>
+      <div class="map-overlay">
+        <div class="coords-chip" id="coordsChip">
+          <span class="coords-icon">📍</span>
+          <span id="coordsText">Obteniendo GPS...</span>
+        </div>
+      </div>
+    </section>
+    <section class="trip-info hidden" id="tripInfo">
+      <div class="info-grid">
+        <div class="info-card">
+          <span class="info-label">Precisión</span>
+          <span class="info-value" id="accuracyVal">—</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Velocidad</span>
+          <span class="info-value" id="speedVal">—</span>
+        </div>
+        <div class="info-card accent">
+          <span class="info-label">Actualizaciones</span>
+          <span class="info-value" id="updateCount">0</span>
+        </div>
+      </div>
+    </section>
+    <section class="share-panel hidden" id="sharePanel">
+      <div class="share-header">
+        <span class="share-title">🔗 Enlace del cliente</span>
+        <span class="share-subtitle">Compartí este enlace para que te sigan en tiempo real</span>
+      </div>
+      <div class="link-box">
+        <input type="text" id="shareLink" class="link-input" readonly />
+        <button class="copy-btn" id="copyBtn" onclick="copiarEnlace()">
+          <span class="copy-icon">📋</span>
+        </button>
+      </div>
+      <div class="share-actions">
+        <button class="share-btn whatsapp" onclick="compartirWhatsApp()">
+          <span>📲</span> WhatsApp
+        </button>
+        <button class="share-btn sms" onclick="compartirSMS()">
+          <span>💬</span> SMS
+        </button>
+      </div>
+    </section>
+  </main>
+  <div class="fab-container">
+    <button class="fab-btn" id="mainBtn" onclick="toggleViaje()">
+      <span class="fab-icon" id="fabIcon">▶</span>
+      <span class="fab-label" id="fabLabel">Iniciar Viaje</span>
+    </button>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/tecnico.js"></script>
+</body>
+</html>
