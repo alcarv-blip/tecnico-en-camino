@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0f172a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <title>Seguimiento — Técnico en Camino</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/styles.css" />
+  <link rel="stylesheet" href="css/cliente.css" />
+</head>
+<body class="dark-theme">
+  <header class="app-header">
+    <div class="header-logo">
+      <span class="logo-icon">⚙️</span>
+      <span class="logo-text">Técnico en Camino</span>
+    </div>
+    <div class="header-badge live" id="statusBadge">
+      <span class="badge-dot pulse"></span>
+      <span class="badge-label">En vivo</span>
+    </div>
+  </header>
+  <div class="map-full" id="map"></div>
+  <div class="bottom-sheet" id="bottomSheet">
+    <div class="sheet-handle"></div>
+    <div class="tech-info-row">
+      <div class="tech-avatar">🛠️</div>
+      <div class="tech-details">
+        <span class="tech-name" id="techName">Tu Técnico</span>
+        <span class="tech-status" id="techStatus">Conectando...</span>
+      </div>
+      <div class="tech-update">
+        <span class="update-dot" id="updateDot"></span>
+        <span class="update-label" id="lastUpdate">—</span>
+      </div>
+    </div>
+    <div class="metrics-row">
+      <div class="metric-card primary">
+        <span class="metric-icon">🕐</span>
+        <span class="metric-value" id="eta">—</span>
+        <span class="metric-label">Tiempo est.</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">📍</span>
+        <span class="metric-value" id="distancia">—</span>
+        <span class="metric-label">Distancia</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-icon">🚗</span>
+        <span class="metric-value" id="velocidad">—</span>
+        <span class="metric-label">Velocidad</span>
+      </div>
+    </div>
+    <div class="contact-row">
+      <button class="contact-btn call" onclick="llamarTecnico()">
+        <span class="contact-icon">📞</span>
+        <span class="contact-label">Llamar</span>
+      </button>
+      <button class="contact-btn whatsapp" onclick="whatsappTecnico()">
+        <span class="contact-icon">💬</span>
+        <span class="contact-label">WhatsApp</span>
+      </button>
+    </div>
+  </div>
+  <div class="waiting-overlay hidden" id="waitingOverlay">
+    <div class="waiting-card">
+      <div class="waiting-spinner">⚙️</div>
+      <h2 class="waiting-title">Esperando al técnico...</h2>
+      <p class="waiting-desc">El técnico aún no inició el viaje.<br/>Esta página se actualizará automáticamente.</p>
+      <div class="waiting-pulse"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/cliente.js"></script>
+</body>
+</html>
