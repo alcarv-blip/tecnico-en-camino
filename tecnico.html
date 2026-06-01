@@ -1,93 +1,205 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Técnico en Camino</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
-  <link rel="stylesheet" href="css/tecnico.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#0f172a"/>
+<title>Técnico en Camino</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f172a;--bg2:#1e293b;--card:#162032;--accent:#f97316;--success:#22c55e;--wa:#25d366;--call:#3b82f6;--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;--border:rgba(255,255,255,0.07);--ba:rgba(249,115,22,0.3)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--t1);display:flex;flex-direction:column;position:fixed;inset:0}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:20px;animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.badge{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:5px 12px}
+.badge.active{border-color:var(--accent)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--t3)}
+.badge.active .dot{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.badge-txt{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+main{flex:1;overflow-y:auto;padding:20px 16px 120px;display:flex;flex-direction:column;gap:16px;-webkit-overflow-scrolling:touch}
+.welcome{display:flex;flex-direction:column;align-items:center;text-align:center;padding:40px 24px;gap:14px}
+.big-icon{font-size:64px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+h1{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;letter-spacing:-.5px}
+.desc{font-size:13px;color:var(--t2);line-height:1.7;max-width:280px}
+.desc strong{color:var(--accent)}
+.map-box{position:relative;border-radius:20px;overflow:hidden;border:1px solid var(--border);height:260px;flex-shrink:0}
+#map{width:100%;height:100%}
+.coords{position:absolute;bottom:12px;left:12px;z-index:500;display:inline-flex;align-items:center;gap:6px;background:rgba(15,23,42,.85);backdrop-filter:blur(8px);border:1px solid var(--ba);border-radius:20px;padding:6px 14px;font-size:11px;color:var(--t2)}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.info-card.hi{border-color:var(--ba);background:rgba(249,115,22,.08)}
+.info-label{font-size:10px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.info-val{font-size:15px;font-weight:700}
+.info-card.hi .info-val{color:var(--accent)}
+.share-box{background:var(--card);border:1px solid var(--ba);border-radius:20px;padding:18px;display:flex;flex-direction:column;gap:14px;flex-shrink:0}
+.share-title{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.share-sub{font-size:12px;color:var(--t2)}
+.link-row{display:flex;gap:8px;align-items:center;overflow:hidden}
+.link-input{flex:1;min-width:0;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'Space Mono',monospace;font-size:11px;color:var(--t2);outline:none}
+.copy-btn{background:var(--accent);border:none;border-radius:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,.3)}
+.share-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.share-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:14px;padding:12px;font-family:'Space Mono',monospace;font-size:13px;font-weight:700;cursor:pointer}
+.share-btn.wa{background:var(--wa);color:#fff}
+.share-btn.sms{background:var(--call);color:#fff}
+.fab-wrap{position:fixed;bottom:0;left:0;right:0;padding:16px;background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:200}
+.fab{width:100%;display:flex;align-items:center;justify-content:center;gap:12px;background:var(--accent);color:#fff;border:none;border-radius:28px;padding:18px 24px;font-family:'Syne',sans-serif;font-size:17px;font-weight:800;cursor:pointer;box-shadow:0 4px 20px rgba(249,115,22,.3);transition:background .2s,transform .15s}
+.fab:active{transform:scale(.97)}
+.fab.danger{background:#ef4444;box-shadow:0 4px 20px rgba(239,68,68,.3)}
+.fab:disabled{background:#475569;box-shadow:none;cursor:not-allowed}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--t1);border:1px solid var(--ba);border-radius:14px;padding:12px 20px;font-size:13px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
 </head>
-<body class="dark-theme">
-  <header class="app-header">
-    <div class="header-logo">
-      <span class="logo-icon">⚙️</span>
-      <span class="logo-text">Técnico en Camino</span>
-    </div>
-    <div class="header-badge" id="statusBadge">
-      <span class="badge-dot"></span>
-      <span class="badge-label">Inactivo</span>
-    </div>
-  </header>
-  <main class="main-content">
-    <section class="status-panel" id="statusPanel">
-      <div class="status-icon-wrap">
-        <div class="status-icon">🛠️</div>
-      </div>
-      <h1 class="status-title">¿Listo para salir?</h1>
-      <p class="status-desc">Presioná <strong>Iniciar Viaje</strong> para compartir tu ubicación en tiempo real con el cliente.</p>
-    </section>
-    <section class="map-section hidden" id="mapSection">
-      <div id="map"></div>
-      <div class="map-overlay">
-        <div class="coords-chip" id="coordsChip">
-          <span class="coords-icon">📍</span>
-          <span id="coordsText">Obteniendo GPS...</span>
-        </div>
-      </div>
-    </section>
-    <section class="trip-info hidden" id="tripInfo">
-      <div class="info-grid">
-        <div class="info-card">
-          <span class="info-label">Precisión</span>
-          <span class="info-value" id="accuracyVal">—</span>
-        </div>
-        <div class="info-card">
-          <span class="info-label">Velocidad</span>
-          <span class="info-value" id="speedVal">—</span>
-        </div>
-        <div class="info-card accent">
-          <span class="info-label">Actualizaciones</span>
-          <span class="info-value" id="updateCount">0</span>
-        </div>
-      </div>
-    </section>
-    <section class="share-panel hidden" id="sharePanel">
-      <div class="share-header">
-        <span class="share-title">🔗 Enlace del cliente</span>
-        <span class="share-subtitle">Compartí este enlace para que te sigan en tiempo real</span>
-      </div>
-      <div class="link-box">
-        <input type="text" id="shareLink" class="link-input" readonly />
-        <button class="copy-btn" id="copyBtn" onclick="copiarEnlace()">
-          <span class="copy-icon">📋</span>
-        </button>
-      </div>
-      <div class="share-actions">
-        <button class="share-btn whatsapp" onclick="compartirWhatsApp()">
-          <span>📲</span> WhatsApp
-        </button>
-        <button class="share-btn sms" onclick="compartirSMS()">
-          <span>💬</span> SMS
-        </button>
-      </div>
-    </section>
-  </main>
-  <div class="fab-container">
-    <button class="fab-btn" id="mainBtn" onclick="toggleViaje()">
-      <span class="fab-icon" id="fabIcon">▶</span>
-      <span class="fab-label" id="fabLabel">Iniciar Viaje</span>
-    </button>
+<body>
+<header>
+  <div class="logo">
+    <span class="logo-icon">⚙️</span>
+    <span class="logo-text">Técnico en Camino</span>
   </div>
-  <div class="toast" id="toast"></div>
-  <script src="js/firebase-config.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/tecnico.js"></script>
+  <div class="badge" id="badge">
+    <span class="dot"></span>
+    <span class="badge-txt" id="badge-txt">Inactivo</span>
+  </div>
+</header>
+<main>
+  <div class="welcome" id="welcome">
+    <span class="big-icon">🛠️</span>
+    <h1>¿Listo para salir?</h1>
+    <p class="desc">Presioná <strong>Iniciar Viaje</strong> para compartir tu ubicación en tiempo real con el cliente.</p>
+  </div>
+  <div class="map-box hidden" id="mapbox">
+    <div id="map"></div>
+    <div class="coords">📍 <span id="coords-txt">Obteniendo GPS...</span></div>
+  </div>
+  <div class="info-grid hidden" id="info">
+    <div class="info-card"><span class="info-label">Precisión</span><span class="info-val" id="acc">—</span></div>
+    <div class="info-card"><span class="info-label">Velocidad</span><span class="info-val" id="spd">—</span></div>
+    <div class="info-card hi"><span class="info-label">Updates</span><span class="info-val" id="upd">0</span></div>
+  </div>
+  <div class="share-box hidden" id="sharebox">
+    <span class="share-title">🔗 Enlace del cliente</span>
+    <span class="share-sub">Compartí este enlace para que te sigan en tiempo real</span>
+    <div class="link-row">
+      <input type="text" id="link" class="link-input" readonly/>
+      <button class="copy-btn" onclick="copiar()">📋</button>
+    </div>
+    <div class="share-btns">
+      <button class="share-btn wa" onclick="irWA()">📲 WhatsApp</button>
+      <button class="share-btn sms" onclick="irSMS()">💬 SMS</button>
+    </div>
+  </div>
+</main>
+<div class="fab-wrap">
+  <button class="fab" id="fab" onclick="toggle()">▶ Iniciar Viaje</button>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getFirestore,doc,setDoc,updateDoc,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const CFG={apiKey:"AIzaSyCVhdcd0Bbj_UopNbcG9oS8_e0Travoxsw",authDomain:"tecnico-en-camino.firebaseapp.com",projectId:"tecnico-en-camino",storageBucket:"tecnico-en-camino.firebasestorage.app",messagingSenderId:"579170875053",appId:"1:579170875053:web:42baac3a7a9463f8e1f824"};
+const TEL="+542944713310";
+const app=initializeApp(CFG);
+const db=getFirestore(app);
+
+let enViaje=false,sid=null,wid=null,map=null,marker=null,cnt=0,lastWrite=0,writing=false;
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+
+window.toggle=function(){if(enViaje)fin();else inicio()};
+
+async function inicio(){
+  if(!navigator.geolocation){toast('❌ Sin soporte GPS');return}
+  const fab=document.getElementById('fab');
+  fab.disabled=true;fab.textContent='Conectando...';
+  sid=Math.random().toString(36).slice(2,12);
+  sessionStorage.setItem('sid',sid);
+  try{
+    await setDoc(doc(db,'viajes',sid),{lat:0,lng:0,activo:true,speed:null,accuracy:null,telefono:TEL,timestamp:Date.now(),serverTime:serverTimestamp()});
+    enViaje=true;
+    document.getElementById('welcome').classList.add('hidden');
+    document.getElementById('mapbox').classList.remove('hidden');
+    document.getElementById('info').classList.remove('hidden');
+    fab.classList.add('danger');fab.textContent='■ Finalizar Viaje';fab.disabled=false;
+    document.getElementById('badge').classList.add('active');
+    document.getElementById('badge-txt').textContent='En viaje';
+    wid=navigator.geolocation.watchPosition(onGPS,onErrGPS,{enableHighAccuracy:true,timeout:12000,maximumAge:0});
+    setTimeout(()=>{
+      document.getElementById('sharebox').classList.remove('hidden');
+      document.getElementById('link').value=`${location.href.replace('tecnico.html','')}cliente.html?id=${sid}`;
+    },600);
+    toast('📍 GPS activado');
+  }catch(e){toast('❌ Error Firebase: '+e.message);fab.disabled=false;fab.textContent='▶ Iniciar Viaje'}
+}
+
+async function fin(){
+  if(!confirm('¿Finalizar el viaje?'))return;
+  if(wid!==null){navigator.geolocation.clearWatch(wid);wid=null}
+  if(sid){
+    try{await updateDoc(doc(db,'viajes',sid),{activo:false,finTimestamp:Date.now()})}catch(e){}
+    sessionStorage.removeItem('sid');
+  }
+  enViaje=false;sid=null;cnt=0;
+  if(marker){marker.remove();marker=null}
+  document.getElementById('welcome').classList.remove('hidden');
+  document.getElementById('mapbox').classList.add('hidden');
+  document.getElementById('info').classList.add('hidden');
+  document.getElementById('sharebox').classList.add('hidden');
+  const fab=document.getElementById('fab');
+  fab.classList.remove('danger');fab.textContent='▶ Iniciar Viaje';fab.disabled=false;
+  document.getElementById('badge').classList.remove('active');
+  document.getElementById('badge-txt').textContent='Inactivo';
+  toast('✅ Viaje finalizado');
+}
+
+async function onGPS(pos){
+  const{latitude:lat,longitude:lng,accuracy,speed}=pos.coords;
+  cnt++;
+  document.getElementById('coords-txt').textContent=`${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+  document.getElementById('acc').textContent=`±${Math.round(accuracy)}m`;
+  document.getElementById('spd').textContent=speed?`${Math.round(speed*3.6)}km/h`:'—';
+  document.getElementById('upd').textContent=cnt;
+  if(!map){
+    map=L.map('map',{zoomControl:false,attributionControl:false,preferCanvas:true}).setView([lat,lng],15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19}).addTo(map);
+    const ico=L.divIcon({className:'',html:`<div style="background:#f97316;width:40px;height:40px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 14px rgba(249,115,22,.65);position:relative"><span style="transform:rotate(45deg);font-size:17px;position:absolute;top:8px;left:8px">🛠️</span></div>`,iconSize:[40,40],iconAnchor:[11,40]});
+    marker=L.marker([lat,lng],{icon:ico}).addTo(map);
+  }else{marker.setLatLng([lat,lng]);map.panTo([lat,lng],{animate:true,duration:.8})}
+  const now=Date.now();
+  if(writing||(now-lastWrite)<3000)return;
+  writing=true;lastWrite=now;
+  try{await setDoc(doc(db,'viajes',sid),{lat,lng,accuracy:Math.round(accuracy),speed:speed?Math.round(speed*3.6):null,activo:true,telefono:TEL,timestamp:now,serverTime:serverTimestamp()},{merge:true})}
+  catch(e){toast('⚠️ Sin conexión')}
+  finally{writing=false}
+}
+
+function onErrGPS(e){const m={1:'❌ Permiso GPS denegado',2:'⚠️ Sin señal GPS',3:'⏱️ Timeout GPS'};toast(m[e.code]||'⚠️ Error GPS')}
+
+window.copiar=async function(){
+  const v=document.getElementById('link').value;
+  if(!v)return;
+  try{await navigator.clipboard.writeText(v)}catch{document.getElementById('link').select();document.execCommand('copy')}
+  toast('✅ Enlace copiado');
+};
+
+window.irWA=function(){
+  const u=document.getElementById('link').value;
+  window.open(`https://wa.me/?text=${encodeURIComponent('Seguí mi ubicación: '+u)},'_blank'`);
+};
+
+window.irSMS=function(){
+  const u=document.getElementById('link').value;
+  window.open(`sms:?body=${encodeURIComponent('Seguí mi ubicación: '+u)}`,'_self');
+};
+</script>
 </body>
 </html>
