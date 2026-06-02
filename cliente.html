@@ -1,83 +1,220 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="theme-color" content="#0f172a" />
-  <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <title>Seguimiento — Técnico en Camino</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="css/styles.css" />
-  <link rel="stylesheet" href="css/cliente.css" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta name="theme-color" content="#0f172a"/>
+<title>Seguimiento — Técnico en Camino</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@600;800&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0f172a;--bg2:#1e293b;--card:#162032;--accent:#f97316;--success:#22c55e;--wa:#25d366;--call:#3b82f6;--t1:#f1f5f9;--t2:#94a3b8;--t3:#475569;--border:rgba(255,255,255,0.07);--ba:rgba(249,115,22,0.3)}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;overflow:hidden}
+body{font-family:'Space Mono',monospace;background:var(--bg);color:var(--t1);display:flex;flex-direction:column;position:fixed;inset:0}
+header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--bg2);border-bottom:1px solid var(--border);flex-shrink:0;z-index:100}
+.logo{display:flex;align-items:center;gap:8px}
+.logo-icon{font-size:20px;animation:spin 8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.logo-text{font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
+.badge{display:flex;align-items:center;gap:6px;background:rgba(34,197,94,0.2);border:1px solid var(--success);border-radius:20px;padding:5px 12px}
+.badge-dot{width:7px;height:7px;border-radius:50%;background:var(--success);animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.5)}50%{box-shadow:0 0 0 6px rgba(34,197,94,0)}}
+.badge-txt{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+#map{flex:1;width:100%;min-height:0}
+.sheet{flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);border-radius:20px 20px 0 0;padding:8px 16px 32px;display:flex;flex-direction:column;gap:14px;box-shadow:0 -8px 32px rgba(0,0,0,0.5);z-index:200}
+.handle{width:40px;height:4px;background:var(--t3);border-radius:2px;margin:4px auto 6px;opacity:.5}
+.tech-row{display:flex;align-items:center;gap:12px}
+.tech-avatar{width:46px;height:46px;background:var(--card);border:2px solid var(--ba);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;animation:breathe 2s ease-in-out infinite}
+@keyframes breathe{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,0.25)}50%{box-shadow:0 0 0 8px rgba(249,115,22,0)}}
+.tech-info{flex:1;display:flex;flex-direction:column;gap:3px}
+.tech-name{font-family:'Syne',sans-serif;font-size:15px;font-weight:700}
+.tech-status{font-size:11px;color:var(--t2)}
+.update-col{display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.update-dot{width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 1.5s ease-in-out infinite}
+.update-dot.stale{background:var(--t3);animation:none}
+.update-label{font-size:10px;color:var(--t3)}
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.metric{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.metric.hi{border-color:var(--ba);background:rgba(249,115,22,0.07)}
+.metric-icon{font-size:18px}
+.metric-val{font-family:'Syne',sans-serif;font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.5px}
+.metric.hi .metric-val{color:var(--accent)}
+.metric-label{font-size:9px;color:var(--t3);text-transform:uppercase;letter-spacing:.5px}
+.contact-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.contact-btn{display:flex;align-items:center;justify-content:center;gap:8px;border:none;border-radius:20px;padding:15px;font-family:'Syne',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:opacity .15s,transform .1s}
+.contact-btn:active{opacity:.85;transform:scale(.97)}
+.contact-btn.call{background:var(--call);color:#fff;box-shadow:0 4px 16px rgba(59,130,246,.3)}
+.contact-btn.wa{background:var(--wa);color:#fff;box-shadow:0 4px 16px rgba(37,211,102,.3)}
+.waiting{position:absolute;inset:0;background:rgba(15,23,42,.92);backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;z-index:500;padding:24px}
+.waiting-card{background:var(--card);border:1px solid var(--ba);border-radius:28px;padding:36px 28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;max-width:300px;width:100%}
+.waiting-spinner{font-size:52px;animation:spin 4s linear infinite}
+.waiting-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:800}
+.waiting-desc{font-size:13px;color:var(--t2);line-height:1.65}
+.waiting-bar{width:60px;height:4px;background:var(--accent);border-radius:2px;animation:bar 1.8s ease-in-out infinite}
+@keyframes bar{0%{width:20px;opacity:.5}50%{width:60px;opacity:1}100%{width:20px;opacity:.5}}
+.toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--card);color:var(--t1);border:1px solid var(--ba);border-radius:14px;padding:12px 20px;font-size:13px;z-index:9999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.hidden{display:none!important}
+</style>
 </head>
-<body class="dark-theme">
-  <header class="app-header">
-    <div class="header-logo">
-      <span class="logo-icon">⚙️</span>
-      <span class="logo-text">Técnico en Camino</span>
+<body>
+<header>
+  <div class="logo">
+    <span class="logo-icon">⚙️</span>
+    <span class="logo-text">Técnico en Camino</span>
+  </div>
+  <div class="badge">
+    <span class="badge-dot"></span>
+    <span class="badge-txt">En vivo</span>
+  </div>
+</header>
+<div id="map"></div>
+<div class="sheet">
+  <div class="handle"></div>
+  <div class="tech-row">
+    <div class="tech-avatar">🛠️</div>
+    <div class="tech-info">
+      <span class="tech-name">Tu Técnico</span>
+      <span class="tech-status" id="status">Conectando...</span>
     </div>
-    <div class="header-badge live" id="statusBadge">
-      <span class="badge-dot pulse"></span>
-      <span class="badge-label">En vivo</span>
-    </div>
-  </header>
-  <div class="map-full" id="map"></div>
-  <div class="bottom-sheet" id="bottomSheet">
-    <div class="sheet-handle"></div>
-    <div class="tech-info-row">
-      <div class="tech-avatar">🛠️</div>
-      <div class="tech-details">
-        <span class="tech-name" id="techName">Tu Técnico</span>
-        <span class="tech-status" id="techStatus">Conectando...</span>
-      </div>
-      <div class="tech-update">
-        <span class="update-dot" id="updateDot"></span>
-        <span class="update-label" id="lastUpdate">—</span>
-      </div>
-    </div>
-    <div class="metrics-row">
-      <div class="metric-card primary">
-        <span class="metric-icon">🕐</span>
-        <span class="metric-value" id="eta">—</span>
-        <span class="metric-label">Tiempo est.</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-icon">📍</span>
-        <span class="metric-value" id="distancia">—</span>
-        <span class="metric-label">Distancia</span>
-      </div>
-      <div class="metric-card">
-        <span class="metric-icon">🚗</span>
-        <span class="metric-value" id="velocidad">—</span>
-        <span class="metric-label">Velocidad</span>
-      </div>
-    </div>
-    <div class="contact-row">
-      <button class="contact-btn call" onclick="llamarTecnico()">
-        <span class="contact-icon">📞</span>
-        <span class="contact-label">Llamar</span>
-      </button>
-      <button class="contact-btn whatsapp" onclick="whatsappTecnico()">
-        <span class="contact-icon">💬</span>
-        <span class="contact-label">WhatsApp</span>
-      </button>
+    <div class="update-col">
+      <span class="update-dot" id="udot"></span>
+      <span class="update-label" id="ulabel">—</span>
     </div>
   </div>
-  <div class="waiting-overlay hidden" id="waitingOverlay">
-    <div class="waiting-card">
-      <div class="waiting-spinner">⚙️</div>
-      <h2 class="waiting-title">Esperando al técnico...</h2>
-      <p class="waiting-desc">El técnico aún no inició el viaje.<br/>Esta página se actualizará automáticamente.</p>
-      <div class="waiting-pulse"></div>
-    </div>
+  <div class="metrics">
+    <div class="metric hi"><span class="metric-icon">🕐</span><span class="metric-val" id="eta">—</span><span class="metric-label">Tiempo est.</span></div>
+    <div class="metric"><span class="metric-icon">📍</span><span class="metric-val" id="dist">—</span><span class="metric-label">Distancia</span></div>
+    <div class="metric"><span class="metric-icon">🚗</span><span class="metric-val" id="vel">—</span><span class="metric-label">Velocidad</span></div>
   </div>
-  <div class="toast" id="toast"></div>
-  <script src="js/firebase-config.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="js/cliente.js"></script>
+  <div class="contact-row">
+    <button class="contact-btn call" onclick="llamar()">📞 Llamar</button>
+    <button class="contact-btn wa" onclick="whatsapp()">💬 WhatsApp</button>
+  </div>
+</div>
+<div class="waiting" id="waiting">
+  <div class="waiting-card">
+    <div class="waiting-spinner">⚙️</div>
+    <h2 class="waiting-title">Esperando al técnico...</h2>
+    <p class="waiting-desc">El técnico aún no inició el viaje. Esta página se actualizará automáticamente.</p>
+    <div class="waiting-bar"></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module">
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import{getFirestore,doc,onSnapshot}from'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+const CFG={apiKey:"AIzaSyCVhdcd0Bbj_UopNbcG9oS8_e0Travoxsw",authDomain:"tecnico-en-camino.firebaseapp.com",projectId:"tecnico-en-camino",storageBucket:"tecnico-en-camino.firebasestorage.app",messagingSenderId:"579170875053",appId:"1:579170875053:web:42baac3a7a9463f8e1f824"};
+
+const app=initializeApp(CFG);
+const db=getFirestore(app);
+
+const params=new URLSearchParams(location.search);
+const sid=params.get('id');
+let map=null,markerTec=null,markerCli=null,linea=null,posClient=null,lastTs=0,tel='',primera=true;
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000)}
+
+function error(m){document.body.innerHTML=`<div style="display:flex;align-items:center;justify-content:center;height:100vh;padding:24px;background:#0f172a;color:#f1f5f9;text-align:center;font-family:'Space Mono',monospace"><div><div style="font-size:52px;margin-bottom:20px">⚠️</div><p style="font-size:13px;color:#94a3b8;line-height:1.75;max-width:300px">${m}</p></div></div>`}
+
+if(!sid){error('Enlace inválido. Pedile al técnico el enlace correcto.');throw new Error('No sid')}
+
+// Inicializar mapa
+map=L.map('map',{zoomControl:true,attributionControl:false,preferCanvas:true,fadeAnimation:false}).setView([-38.4,-63.6],4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,updateWhenIdle:true}).addTo(map);
+
+// GPS del cliente
+if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const{latitude:lat,longitude:lng}=pos.coords;
+    posClient={lat,lng};
+    const ico=L.divIcon({className:'',html:`<div style="background:#3b82f6;width:34px;height:34px;border-radius:50%;border:3px solid #fff;box-shadow:0 2px 12px rgba(59,130,246,.65);display:flex;align-items:center;justify-content:center;font-size:15px">👤</div>`,iconSize:[34,34],iconAnchor:[17,17]});
+    markerCli=L.marker([lat,lng],{icon:ico}).bindPopup('<strong>Tu ubicación</strong>').addTo(map);
+  },()=>{},{ enableHighAccuracy:true,timeout:10000,maximumAge:60000});
+}
+
+// Listener Firestore
+onSnapshot(doc(db,'viajes',sid),snap=>{
+  if(!snap.exists()){document.getElementById('waiting').classList.remove('hidden');return}
+  const d=snap.data();
+  if(d.telefono)tel=d.telefono;
+  if(!d.activo){
+    document.getElementById('status').textContent='El técnico finalizó el viaje';
+    document.getElementById('udot').classList.add('stale');
+    toast('El técnico finalizó el viaje ✅');
+    return;
+  }
+  if(d.lat===0&&d.lng===0){
+    document.getElementById('waiting').classList.remove('hidden');
+    document.getElementById('status').textContent='Obteniendo GPS...';
+    return;
+  }
+  document.getElementById('waiting').classList.add('hidden');
+  actualizarUI(d);
+},err=>{console.error(err);toast('⚠️ Error de conexión')});
+
+function actualizarUI(d){
+  const{lat,lng,speed,timestamp}=d;
+  // Marcador técnico
+  if(!markerTec){
+    const ico=L.divIcon({className:'',html:`<div style="background:#f97316;width:44px;height:44px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 18px rgba(249,115,22,.7);position:relative"><span style="transform:rotate(45deg);font-size:19px;position:absolute;top:10px;left:10px">🛠️</span></div>`,iconSize:[44,44],iconAnchor:[13,44]});
+    markerTec=L.marker([lat,lng],{icon:ico}).bindPopup('<strong>Tu técnico</strong>').addTo(map);
+  }else{markerTec.setLatLng([lat,lng])}
+
+  // Primera vez: ajustar zoom
+  if(primera){
+    primera=false;
+    if(posClient){
+      map.fitBounds(L.latLngBounds([lat,lng],[posClient.lat,posClient.lng]),{padding:[70,70],animate:true});
+    }else{map.setView([lat,lng],14,{animate:true})}
+  }else{map.panTo([lat,lng],{animate:true,duration:.8})}
+
+  // Línea técnico-cliente
+  if(posClient){
+    const pts=[[lat,lng],[posClient.lat,posClient.lng]];
+    if(!linea)linea=L.polyline(pts,{color:'#f97316',weight:2,opacity:.55,dashArray:'6,9'}).addTo(map);
+    else linea.setLatLngs(pts);
+    // Métricas
+    const dist=haversine(posClient.lat,posClient.lng,lat,lng);
+    const vel=(speed&&speed>0)?speed:30;
+    const mins=Math.round((dist/vel)*60);
+    document.getElementById('dist').textContent=dist<1?`${Math.round(dist*1000)}m`:`${dist.toFixed(1)}km`;
+    document.getElementById('eta').textContent=fmtEta(mins);
+    if(dist<0.05)document.getElementById('status').textContent='¡El técnico llegó! 🎉';
+    else if(dist<0.2)document.getElementById('status').textContent='¡Llegando! A metros de vos';
+    else document.getElementById('status').textContent=`A ${dist.toFixed(1)} km de vos`;
+    // Línea técnico-cliente
+    if(linea)linea.setLatLngs([[lat,lng],[posClient.lat,posClient.lng]]);
+  }else{
+    document.getElementById('status').textContent='Localizando...';
+  }
+  document.getElementById('vel').textContent=(speed&&speed>0)?`${speed}km/h`:'—';
+  lastTs=timestamp||Date.now();
+}
+
+// Actualizar "hace Xs"
+setInterval(()=>{
+  if(!lastTs)return;
+  const s=Math.round((Date.now()-lastTs)/1000);
+  document.getElementById('ulabel').textContent=s<5?'Ahora':`hace ${s}s`;
+  document.getElementById('udot').classList.toggle('stale',(Date.now()-lastTs)>20000);
+},1000);
+
+function haversine(la1,lo1,la2,lo2){
+  const R=6371,dLat=(la2-la1)*Math.PI/180,dLng=(lo2-lo1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(la1*Math.PI/180)*Math.cos(la2*Math.PI/180)*Math.sin(dLng/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function fmtEta(m){if(m<1)return'<1min';if(m<60)return`${m}min`;const h=Math.floor(m/60),r=m%60;return r?`${h}h${r}m`:`${h}h`}
+
+window.llamar=function(){if(!tel){toast('⚠️ Número no disponible');return}location.href=`tel:${tel}`};
+window.whatsapp=function(){if(!tel){toast('⚠️ Número no disponible');return}window.open(`https://wa.me/${tel.replace(/\D/g,'')}`)};
+
+window.addEventListener('beforeunload',()=>{});
+</script>
 </body>
 </html>
